@@ -2,33 +2,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('pongCanvas');
     const ctx = canvas.getContext('2d');
 
-    console.log('Canvas:', canvas);
-    console.log('Context:', ctx);
+    const refSize = Math.min(canvas.width, canvas.height);
 
     const ball = {
         x: canvas.width / 2,
         y: canvas.height / 2,
-        radius: 8,
-        speedX: 8,
-        speedY: 8,
+        radius: refSize * 0.013,
+        speedX: refSize * 0.013,
+        speedY: refSize * 0.013,
         firstCollision: true
     };
 
-    const paddleWidth = 10;
-    const paddleHeight = 80;
+    const paddleWidth = refSize * 0.015;
+    const paddleHeight = refSize * 0.13;
 
     const player = {
-        x: 50,
+        x: refSize * 0.08,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: 8
+        speed: refSize * 0.013
     };
 
     const ai = {
-        x: canvas.width - 50 - paddleWidth,
+        x: canvas.width - refSize * 0.08 - paddleWidth,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: 4
+        speed: refSize * 0.0065
     };
 
     let keys = { ArrowUp: false, ArrowDown: false };
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ball.speedY = -ball.speedY * 1.1;
         }
 
-        let speedIncrease = ball.firstCollision ? 2 : 0.5;
+        let speedIncrease = ball.firstCollision ? refSize * 0.0033 : refSize * 0.0008;
 
         if (
             ball.x - ball.radius < player.x + paddleWidth &&
@@ -112,11 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetBall() {
         if (gameOver) return;
-
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
-        ball.speedX = -ball.speedX > 0 ? 8 : -8;
-        ball.speedY = 8 * (ball.speedY > 0 ? 1 : -1);
+        ball.speedX = (-ball.speedX > 0 ? refSize * 0.013 : -refSize * 0.013);
+        ball.speedY = refSize * 0.013 * (ball.speedY > 0 ? 1 : -1);
         ball.firstCollision = true;
     }
 
@@ -144,21 +142,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillRect(player.x, player.y, paddleWidth, paddleHeight);
         ctx.fillRect(ai.x, ai.y, paddleWidth, paddleHeight);
 
-        ctx.font = '32px Arial';
-        ctx.fillText(player.score, canvas.width / 4, 50);
-        ctx.fillText(ai.score, 3 * canvas.width / 4, 50);
+        ctx.font = `${refSize * 0.053}px Arial`;
+        ctx.fillText(player.score, canvas.width / 4, refSize * 0.083);
+        ctx.fillText(ai.score, 3 * canvas.width / 4, refSize * 0.083);
 
         if (gameOver) {
-            ctx.fillStyle = 'red';
-            ctx.font = '48px Arial';
+            ctx.font = `${refSize * 0.08}px Arial`;
             ctx.fillText(
                 player.score > ai.score ? "Player Wins!" : "AI Wins!",
-                canvas.width / 2 - 100,
+                canvas.width / 2 - refSize * 0.16,
                 canvas.height / 2
             );
-
-            ctx.font = '24px Arial';
-            ctx.fillText("Press R to Restart", canvas.width / 2 - 80, canvas.height / 2 + 40);
+            ctx.font = `${refSize * 0.04}px Arial`;
+            ctx.fillText("Press R to Restart", canvas.width / 2 - refSize * 0.13, canvas.height / 2 + refSize * 0.067);
         }
     }
 
