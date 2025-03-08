@@ -31,13 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let keys = { ArrowUp: false, ArrowDown: false };
-
+    let paused = false;
     const winningScore = 11;
     let gameOver = false;
 
     document.addEventListener('keydown', (e) => {
         if (e.key in keys) keys[e.key] = true;
         if (e.key === 'r' && gameOver) restartGame();
+        if (e.key === 'Escape') paused = !paused;
     });
 
     document.addEventListener('keyup', (e) => {
@@ -156,6 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.font = `${refSize * 0.04}px Arial`;
             ctx.fillText("Press R to Restart", canvas.width / 2 - refSize * 0.13, canvas.height / 2 + refSize * 0.067);
         }
+
+        if (paused && !gameOver) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.font = `${refSize * 0.08}px Arial`;
+            ctx.fillText("Paused", canvas.width / 2 - refSize * 0.1, canvas.height / 2);
+            ctx.font = `${refSize * 0.04}px Arial`;
+            ctx.fillText("Press Esc to Resume", canvas.width / 2 - refSize * 0.15, canvas.height / 2 + refSize * 0.067);
+        }
     }
 
     function restartGame() {
@@ -166,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function gameLoop() {
-        if (!gameOver) {
+        if (!paused && !gameOver) {
             update();
         }
         draw();
