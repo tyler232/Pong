@@ -22,7 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         x: refSize * 0.08,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: refSize * 0.02
+        speed: refSize * 0.02,
+        reactionTimer: 0,
+        targetY: canvas.height / 2 - paddleHeight / 2,
+        lastUpdate: 0
     };
 
     const ai = {
@@ -56,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const speedScale = deltaTime / (1000 / 60);
 
-        if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
-        if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed;
+        if (keys.ArrowUp && player.y > 0) player.y -= player.speed * speedScale;
+        if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed * speedScale;
 
         updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player.y);
 
