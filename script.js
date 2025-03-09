@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const speedScale = deltaTime / (1000 / 60);
 
-        if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
-        if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed;
+        if (keys.ArrowUp && player.y > 0) player.y -= player.speed * speedScale;
+        if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed * speedScale;
 
         updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player.y);
 

@@ -10,43 +10,49 @@ function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player_locati
             else if (predictedY > canvas.height) predictedY = 2 * canvas.height - predictedY;
         }
 
-        // calculate and try to hit as far from current player as possible
-        let playerCenterY = player_location + paddleHeight / 2;
-        let furthestY = (playerCenterY < canvas.height / 2) ? 0 : canvas.height;
-        let distanceToPlayerSide = canvas.width - ai.x;
-        let timeToPlayerSide = distanceToPlayerSide / Math.abs(ball.speedX);
-        let deltaYNeeded = furthestY - predictedY;
-        let requiredSpeedY = deltaYNeeded / timeToPlayerSide;
+        // calculate and try to hit as far from current player as possible using four contact point
+        const hitPositions = [-0.45, -0.25, 0, 0.25, 0.45];
 
-        let bounceAdjustedY = furthestY;
-        let bounces = 0;
-        while (bounceAdjustedY < 0 || bounceAdjustedY > canvas.height) {
-            if (bounceAdjustedY < 0) bounceAdjustedY = -bounceAdjustedY;
-            else if (bounceAdjustedY > canvas.height) bounceAdjustedY = 2 * canvas.height - bounceAdjustedY;
-            bounces++;
+        const maxBounceAngle = Math.PI / 3;
+        const ballSpeedMagnitude = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
+
+        let bestTargetY = ai.y;
+        let bestDistance = -Infinity;
+
+        for (let relativePos of hitPositions) {
+            let bounceAngle = relativePos * maxBounceAngle;
+
+            let newSpeedX = -Math.abs(ballSpeedMagnitude * Math.cos(bounceAngle)); // go back to player
+            let newSpeedY = ballSpeedMagnitude * Math.sin(bounceAngle);
+
+            let distanceToPlayer = ai.x - 0; // distance from ai to player
+            let timeToPlayer = distanceToPlayer / Math.abs(newSpeedX);
+            let landingY = predictedY + newSpeedY * timeToPlayer;
+
+            while (landingY < 0 || landingY > canvas.height) {
+                if (landingY < 0) landingY = -landingY;
+                else if (landingY > canvas.height) landingY = 2 * canvas.height - landingY;
+            }
+
+            let playerCenterY = player_location + paddleHeight / 2;
+            let distanceFromPlayer = Math.abs(landingY - playerCenterY);
+
+            if (distanceFromPlayer > bestDistance) {
+                bestDistance = distanceFromPlayer;
+                bestTargetY = predictedY - paddleHeight / 2 + relativePos * paddleHeight;
+            }
         }
-        let effectiveDeltaY = (bounces % 2 === 0) ? furthestY - predictedY : - (furthestY - predictedY);
-        requiredSpeedY = effectiveDeltaY / timeToPlayerSide;
 
-        let maxBounceAngle = Math.PI / 3;
-        let ballSpeedMagnitude = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
-        let maxSpeedY = ballSpeedMagnitude * Math.tan(maxBounceAngle);
-
-        requiredSpeedY = Math.max(-maxSpeedY, Math.min(maxSpeedY, requiredSpeedY));
-
-        let hitPosition = requiredSpeedY / maxSpeedY * 0.5;
-        let targetY = predictedY - paddleHeight / 2 + hitPosition * paddleHeight;
-
-        targetY = Math.max(0, Math.min(canvas.height - paddleHeight, targetY));
+        bestTargetY = Math.max(0, Math.min(canvas.height - paddleHeight, bestTargetY));
 
         // apply movement
         const speedScale = deltaTime / (1000 / 60);
         const moveSpeed = ai.speed * speedScale;
 
-        if (ai.y < targetY && ai.y < canvas.height - paddleHeight) {
-            ai.y += Math.min(moveSpeed, targetY - ai.y);
-        } else if (ai.y > targetY && ai.y > 0) {
-            ai.y -= Math.min(moveSpeed, ai.y - targetY);
+        if (ai.y < bestTargetY && ai.y < canvas.height - paddleHeight) {
+            ai.y += Math.min(moveSpeed, bestTargetY - ai.y);
+        } else if (ai.y > bestTargetY && ai.y > 0) {
+            ai.y -= Math.min(moveSpeed, ai.y - bestTargetY);
         }
     }
 }
