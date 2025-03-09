@@ -6,33 +6,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_BALL_SPEED_X = refSize * 0.005;
     const INITIAL_BALL_SPEED_Y = refSize * 0.005;
 
+    const paddleWidth = refSize * 0.015;
+    const paddleHeight = refSize * 0.13;
+
+    const INITIAL_PLAYER_X = refSize * 0.08;
+    const INITIAL_PLAYER_Y = canvas.height / 2 - paddleHeight / 2;
+    const INITIAL_AI_X = canvas.width - refSize * 0.08 - paddleWidth;
+    const INITIAL_AI_Y = canvas.height / 2 - paddleHeight / 2;
+
     const ball = {
         x: canvas.width / 2,
         y: canvas.height / 2,
         radius: refSize * 0.013,
-        speedX: -INITIAL_BALL_SPEED_X,
+        speedX: INITIAL_BALL_SPEED_X,
         speedY: INITIAL_BALL_SPEED_Y,
         firstCollision: true
     };
 
-    const paddleWidth = refSize * 0.015;
-    const paddleHeight = refSize * 0.13;
-
     const player = {
-        x: refSize * 0.08,
-        y: canvas.height / 2 - paddleHeight / 2,
+        x: INITIAL_PLAYER_X,
+        y: INITIAL_PLAYER_Y,
         score: 0,
-        speed: refSize * 0.02,
-        reactionTimer: 0,
-        targetY: canvas.height / 2 - paddleHeight / 2,
-        lastUpdate: 0
+        speed: refSize * 0.02
     };
 
     const ai = {
-        x: canvas.width - refSize * 0.08 - paddleWidth,
-        y: canvas.height / 2 - paddleHeight / 2,
+        x: INITIAL_AI_X,
+        y: INITIAL_AI_Y,
         score: 0,
-        speed: refSize * 0.015
+        speed: refSize * 0.015,
+        reactionTimer: 0,
+        targetY: canvas.height / 2 - paddleHeight / 2,
     };
 
     let keys = { ArrowUp: false, ArrowDown: false };
@@ -199,17 +203,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restartGame() {
         player.score = 0;
+        player.x = INITIAL_PLAYER_X;
+        player.y = INITIAL_PLAYER_Y;
         ai.score = 0;
+        ai.x = INITIAL_AI_X;
+        ai.y = INITIAL_AI_Y;
         gameOver = false;
         isStarted = true;
-        resetBall('player');
+        resetBall('ai');
     }
 
     function gameLoop(currentTime) {
         const deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        if (!paused && !gameOver) {
+        if (isStarted && !paused && !gameOver) {
             update(deltaTime);
         }
         draw();
