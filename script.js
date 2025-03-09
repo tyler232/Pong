@@ -22,7 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         x: refSize * 0.08,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: refSize * 0.02
+        speed: refSize * 0.02,
+        reactionTimer: 0,
+        targetY: canvas.height / 2 - paddleHeight / 2,
+        lastUpdate: 0
     };
 
     const ai = {
