@@ -1,4 +1,4 @@
-function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player) {
+function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime) {
     if (ball.speedX > 0) {
         // predict where the ball will land on AI's side
         let timeToReach = (ai.x - ball.x) / ball.speedX;

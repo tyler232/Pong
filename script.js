@@ -125,9 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
 
-        if (winner === 'ai') {
+        if (winner === 'player') {
             ball.speedX = INITIAL_BALL_SPEED_X;
-        } else if (winner === 'player') {
+        } else if (winner === 'ai') {
             ball.speedX = -INITIAL_BALL_SPEED_X;
         }
 
