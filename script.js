@@ -3,13 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
 
     const refSize = Math.min(canvas.width, canvas.height);
+    const INITIAL_BALL_SPEED_X = refSize * 0.005;
+    const INITIAL_BALL_SPEED_Y = refSize * 0.005;
 
     const ball = {
         x: canvas.width / 2,
         y: canvas.height / 2,
         radius: refSize * 0.013,
-        speedX: refSize * 0.013,
-        speedY: refSize * 0.013,
+        speedX: refSize * 0.005,
+        speedY: refSize * 0.005,
         firstCollision: true
     };
 
@@ -20,14 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         x: refSize * 0.08,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: refSize * 0.013
+        speed: refSize * 0.02
     };
 
     const ai = {
         x: canvas.width - refSize * 0.08 - paddleWidth,
         y: canvas.height / 2 - paddleHeight / 2,
         score: 0,
-        speed: refSize * 0.0065
+        speed: refSize * 0.015
     };
 
     let keys = { ArrowUp: false, ArrowDown: false };
@@ -35,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isStarted = false;
     const winningScore = 11;
     let gameOver = false;
+
+    let lastTime = performance.now();
 
     document.addEventListener('keydown', (e) => {
         if (e.key in keys) keys[e.key] = true;
@@ -47,22 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key in keys) keys[e.key] = false;
     });
 
-    function update() {
+    function update(deltaTime) {
         if (gameOver) return;
+
+        const speedScale = deltaTime / (1000 / 60);
 
         if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
         if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed;
 
-        updateAIPaddle(ball, ai, canvas, paddleHeight);
+        updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime);
 
-        ball.x += ball.speedX;
-        ball.y += ball.speedY;
+        ball.x += ball.speedX * speedScale;
+        ball.y += ball.speedY * speedScale;
 
         if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
             ball.speedY = -ball.speedY * 1.1;
         }
 
-        let speedIncrease = ball.firstCollision ? refSize * 0.0033 : refSize * 0.0008;
+        let speedIncrease = ball.firstCollision ? refSize * 0.01 : refSize * 0.001;
 
         if (
             ball.x - ball.radius < player.x + paddleWidth &&
@@ -95,11 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ball.x < 0) {
             ai.score++;
             checkWinner();
-            resetBall();
+            resetBall('ai');
         } else if (ball.x > canvas.width) {
             player.score++;
             checkWinner();
-            resetBall();
+            resetBall('player');
         }
     }
 
@@ -113,12 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function resetBall() {
+    function resetBall(winner) {
         if (gameOver) return;
+
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
-        ball.speedX = (-ball.speedX > 0 ? refSize * 0.013 : -refSize * 0.013);
-        ball.speedY = refSize * 0.013 * (ball.speedY > 0 ? 1 : -1);
+
+        if (winner === 'ai') {
+            ball.speedX = INITIAL_BALL_SPEED_X;
+        } else if (winner === 'player') {
+            ball.speedX = -INITIAL_BALL_SPEED_X;
+        }
+
+        ball.speedY = INITIAL_BALL_SPEED_Y * (Math.random() > 0.5 ? 1 : -1);
         ball.firstCollision = true;
     }
 
@@ -186,16 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ai.score = 0;
         gameOver = false;
         isStarted = true;
-        resetBall();
+        resetBall('player');
     }
 
-    function gameLoop() {
+    function gameLoop(currentTime) {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
         if (!paused && !gameOver) {
-            update();
+            update(deltaTime);
         }
         draw();
         requestAnimationFrame(gameLoop);
     }
-
-    gameLoop();
+    
+    gameLoop(performance.now());
 });
