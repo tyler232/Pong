@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
         x: canvas.width / 2,
         y: canvas.height / 2,
         radius: refSize * 0.013,
-        speedX: refSize * 0.005,
-        speedY: refSize * 0.005,
+        speedX: -INITIAL_BALL_SPEED_X,
+        speedY: INITIAL_BALL_SPEED_Y,
         firstCollision: true
     };
 
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
         if (keys.ArrowDown && player.y < canvas.height - paddleHeight) player.y += player.speed;
 
-        updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime);
+        updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player.y);
 
         ball.x += ball.speedX * speedScale;
         ball.y += ball.speedY * speedScale;
@@ -126,9 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.y = canvas.height / 2;
 
         if (winner === 'player') {
-            ball.speedX = INITIAL_BALL_SPEED_X;
-        } else if (winner === 'ai') {
             ball.speedX = -INITIAL_BALL_SPEED_X;
+        } else if (winner === 'ai') {
+            ball.speedX = INITIAL_BALL_SPEED_X;
         }
 
         ball.speedY = INITIAL_BALL_SPEED_Y * (Math.random() > 0.5 ? 1 : -1);

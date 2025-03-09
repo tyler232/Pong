@@ -1,4 +1,4 @@
-function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime) {
+function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player_location) {
     if (ball.speedX > 0) {
         // predict where the ball will land on AI's side
         let timeToReach = (ai.x - ball.x) / ball.speedX;
@@ -11,7 +11,7 @@ function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime) {
         }
 
         // calculate and try to hit as far from current player as possible
-        let playerCenterY = player.y + paddleHeight / 2;
+        let playerCenterY = player_location + paddleHeight / 2;
         let furthestY = (playerCenterY < canvas.height / 2) ? canvas.height : 0;
         let distanceToPlayerSide = canvas.width - ai.x;
         let timeToPlayerSide = distanceToPlayerSide / Math.abs(ball.speedX);
