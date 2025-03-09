@@ -12,7 +12,7 @@ function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player_locati
 
         // calculate and try to hit as far from current player as possible
         let playerCenterY = player_location + paddleHeight / 2;
-        let furthestY = (playerCenterY < canvas.height / 2) ? canvas.height : 0;
+        let furthestY = (playerCenterY < canvas.height / 2) ? 0 : canvas.height;
         let distanceToPlayerSide = canvas.width - ai.x;
         let timeToPlayerSide = distanceToPlayerSide / Math.abs(ball.speedX);
         let deltaYNeeded = furthestY - predictedY;
