@@ -2,7 +2,6 @@ function updateAIPaddle(ball, ai, canvas, paddleHeight, deltaTime, player_locati
     const reactionDelay = 100; // milliseconds
     ai.reactionTimer = ai.reactionTimer || 0;
     ai.targetY = ai.targetY || ai.y;
-    ai.lastUpdate = ai.lastUpdate || 0;
 
     if (ball.speedX > 0) {
         ai.reactionTimer += deltaTime;
